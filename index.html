@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BLEEP.</title>
+    
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="20" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="neonGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23ff00ff;stop-opacity:1" /><stop offset="100%" style="stop-color:%23aa00ff;stop-opacity:1" /></linearGradient></defs><rect width="512" height="512" rx="100" fill="%23050505"/><path d="M150 150 L150 362 M256 150 L256 362 M362 150 L362 362" stroke="url(%23neonGrad)" stroke-width="60" stroke-linecap="round" filter="url(%23glow)"/><rect x="130" y="200" width="252" height="112" rx="20" fill="%23050505" opacity="0.8"/></svg>'>
+
+    <link rel="manifest" href='data:application/manifest+json,{"name":"BLEEP","short_name":"BLEEP","start_url":".","display":"standalone","background_color":"#050505","theme_color":"#050505","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/564/564619.png","sizes":"192x192","type":"image/png"}]}'>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* --- GLOBAL RESET --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at center, #1a0520 0%, #050505 60%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        /* --- 1. NAVBAR --- */
+        .bleep-nav {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 30px 20px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .nav-logo:hover { opacity: 1; text-shadow: 0 0 15px rgba(212,0,255,0.5); }
+        .nav-logo span { color: #d400ff; }
+
+        /* --- 2. HERO SECTION --- */
+        .hero-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            margin-bottom: 20px;
+        }
+
+        .title-zone {
+            display: inline-block;
+            padding: 30px;
+            cursor: default;
+        }
+        
+        .hero-title {
+            font-size: 16vw; 
+            max-font-size: 8rem;
+            margin: 0;
+            line-height: 1;
+            font-weight: 700; 
+            paint-order: stroke fill;
+            letter-spacing: -0.03em;
+            color: #1a0515;
+            -webkit-text-stroke: 2px #541a66;
+            text-shadow: 0 5px 15px rgba(0,0,0,1);
+            opacity: 1;
+            transition: all 0.1s;
+        }
+
+        @media (min-width: 800px) {
+            .hero-title { font-size: 8rem; -webkit-text-stroke: 3px #541a66; }
+        }
+
+        .neon-active .hero-title {
+            color: #fff;
+            -webkit-text-stroke: 3px #e080ff;
+            text-shadow: 0 0 5px #fff, 0 0 20px #d400ff, 0 0 80px #d400ff, 0 10px 20px rgba(0,0,0,1);
+            animation: neon-flicker 1.5s steps(15, end) forwards, neon-hum 0.1s infinite alternate;
+        }
+
+        @keyframes neon-flicker {
+            0%   { opacity: 0.8; color: #1a0515; text-shadow: none; }
+            5%   { opacity: 1; color: #fff; text-shadow: 0 0 20px #d400ff; }
+            10%  { opacity: 0.8; color: #1a0515; text-shadow: none; }
+            30%  { opacity: 1; color: #fff; text-shadow: 0 0 60px #d400ff; }
+            100% { opacity: 1; color: #fff; }
+        }
+        @keyframes neon-hum {
+            from { text-shadow: 0 0 10px #fff, 0 0 20px #d400ff, 0 0 80px #d400ff; }
+            to   { text-shadow: 0 0 12px #fff, 0 0 22px #d400ff, 0 0 85px #d400ff; }
+        }
+
+        .subtitle { color: #888; font-size: 1.1rem; margin-bottom: 25px; font-weight: 300; margin-top: 10px; }
+
+        /* --- PLATFORM API BUTTONS --- */
+        .platform-dock {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .platform-btn {
+            width: 75px; 
+            height: 75px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid #333;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .platform-btn svg { width: 36px; height: 36px; fill: #666; transition: 0.3s; }
+        .platform-btn.spotify:hover { border-color: #1DB954; box-shadow: 0 0 25px rgba(29, 185, 84, 0.3); transform: translateY(-3px); }
+        .platform-btn.spotify:hover svg { fill: #1DB954; }
+        .platform-btn.apple:hover { border-color: #FA243C; box-shadow: 0 0 25px rgba(250, 36, 60, 0.3); transform: translateY(-3px); }
+        .platform-btn.apple:hover svg { fill: #FA243C; }
+        .platform-btn:active { transform: scale(0.95); }
+
+        /* --- SEARCH BAR --- */
+        .search-container { position: relative; max-width: 500px; width: 100%; margin: 0 auto; padding: 10px; }
+        .bleep-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 18px;
+            border-radius: 15px;
+            border: 2px solid #333;
+            background: #0a0a0a;
+            color: white;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+            -webkit-appearance: none;
+        }
+        .search-container:hover .bleep-input { border-color: #8c00aa; box-shadow: 0 0 30px rgba(170,0,212,0.2); transform: scale(1.02); }
+        .bleep-input:focus { border-color: #d400ff; box-shadow: 0 0 60px rgba(212,0,255,0.5); background: #000; transform: scale(1.02); }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .main-btn {
+            padding: 15px 50px;
+            font-size: 16px;
+            font-weight: 700;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+            -webkit-tap-highlight-color: transparent;
+            min-width: 200px;
+        }
+        .main-btn:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+        .main-btn:active { transform: scale(0.95); }
+
+        .import-btn {
+            background: transparent;
+            color: #888;
+            border: 1px solid #333;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .import-btn:hover { color: #fff; border-color: #666; background: rgba(255,255,255,0.05); }
+        
+        #bleep-results { margin-top: 40px; display: flex; flex-direction: column; gap: 15px; width: 100%; }
+
+        /* --- SLIM FOOTER --- */
+        .bleep-footer {
+            margin-top: auto;
+            width: 100%;
+            background: #080808;
+            border-top: 1px solid rgba(212,0,255,0.2);
+            box-shadow: 0 -10px 40px rgba(212,0,255,0.05);
+            padding: 25px 20px;
+            text-align: center;
+        }
+        
+        .footer-slim-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            color: #555;
+            font-size: 0.8rem;
+        }
+
+        .footer-logo { font-weight: 800; color: #fff; font-size: 1rem; margin-right: 10px; }
+        .footer-links a { color: #666; text-decoration: none; margin: 0 8px; transition: 0.3s; }
+        .footer-links a:hover { color: #d400ff; }
+        .footer-copy { color: #444; margin-left: 10px; }
+
+        /* --- CARDS --- */
+        .bleep-card { 
+            background: rgba(20,20,20,0.9); 
+            border: 1px solid #333; 
+            padding: 15px; 
+            border-radius: 16px; 
+            display: flex; 
+            align-items: center; 
+            text-align: left; 
+            /* REMOVED ANIMATION to fix rendering bug */
+        }
+        
+        .bleep-art { 
+            display: block;
+            width: 60px; 
+            height: 60px; 
+            border-radius: 8px; 
+            margin-right: 15px; 
+            object-fit: cover; 
+            flex-shrink: 0; 
+            background: #333; 
+        }
+        
+        .bleep-info { flex-grow: 1; min-width: 0; }
+        .b-title { font-weight: 700; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .b-artist { color: #888; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .badge { font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; font-weight: 800; margin-left: 10px; flex-shrink: 0; }
+        .clean { background: rgba(0,255,127,0.1); color: #00ff7f; border: 1px solid #00ff7f; }
+        .explicit { background: rgba(255,59,48,0.1); color: #ff3b30; border: 1px solid #ff3b30; }
+        
+        .matched-btn {
+            background: rgba(0,255,127,0.1); color: #00ff7f; border: 1px solid #00ff7f;
+            cursor: pointer; transition: 0.2s;
+        }
+        .matched-btn:active { transform: scale(0.95); background: rgba(0,255,127,0.3); }
+
+        .fix-btn { 
+            background: #ff3b30; color: white; border: none; padding: 8px 15px; border-radius: 20px; 
+            font-weight: bold; font-size: 0.75rem; cursor: pointer; margin-left: 10px; flex-shrink: 0;
+            transition: 0.1s;
+        }
+        .fix-btn:active { transform: scale(0.95); }
+
+        .card-success { border-color: #00ff7f; background: rgba(0, 255, 127, 0.05); }
+
+        /* --- MODALS --- */
+        .modal-overlay {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 1000;
+            justify-content: center; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: #111; border: 1px solid #333; padding: 30px; border-radius: 24px;
+            max-width: 320px; width: 90%; text-align: center;
+            box-shadow: 0 0 50px rgba(212,0,255,0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .modal-icon { font-size: 3rem; margin-bottom: 15px; display: block; }
+        .modal-btn { 
+            margin-top: 20px; padding: 12px 30px; background: white; color: black; 
+            border: none; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 1rem;
+        }
+
+        .destination-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .dest-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid #333; border-radius: 12px;
+            padding: 20px 10px; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 10px;
+            color: white; text-decoration: none; font-size: 0.8rem; font-weight: 700;
+        }
+        .dest-btn svg { width: 30px; height: 30px; fill: #fff; }
+        .dest-btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-3px); }
+        .dest-btn:active { transform: scale(0.95); }
+
+        /* AUTH BUTTONS */
+        .auth-btn {
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; padding: 15px; border-radius: 12px; font-weight: 700;
+            margin-bottom: 15px; cursor: pointer; border: none; font-size: 0.95rem; transition: 0.2s;
+        }
+        .auth-btn svg { width: 24px; height: 24px; }
+        
+        .auth-spotify { background: #1DB954; color: white; }
+        .auth-spotify:hover { background: #1ed760; }
+        .auth-spotify svg { fill: white; }
+
+        .auth-apple { background: #FA243C; color: white; }
+        .auth-apple:hover { background: #ff364e; }
+        .auth-apple svg { fill: white; }
+
+        /* PLAYLIST LIST */
+        .playlist-list { display: none; text-align: left; margin-top: 20px; max-height: 300px; overflow-y: auto; }
+        .playlist-item {
+            padding: 15px; border-bottom: 1px solid #222; cursor: pointer; transition: 0.2s;
+            display: flex; align-items: center; gap: 15px;
+        }
+        .playlist-item:hover { background: rgba(255,255,255,0.05); }
+        .pl-img { width: 40px; height: 40px; background: #333; border-radius: 4px; }
+        .pl-name { font-weight: 700; display: block; }
+        .pl-count { color: #666; font-size: 0.8rem; }
+
+        @media (max-width: 600px) {
+            .bleep-nav { justify-content: center; padding: 20px; }
+            .hero-section { margin-bottom: 20px; }
+            .footer-slim-content { flex-direction: column; gap: 15px; }
+            .footer-copy { margin-left: 0; }
+            .footer-logo { margin-right: 0; font-size: 1.2rem;}
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="bleep-nav">
+        <a onclick="resetHome()" class="nav-logo">BLEEP<span>.</span></a>
+    </nav>
+
+    <div class="hero-section">
+        <div class="title-zone" onmouseover="this.classList.add('neon-active')" ontouchstart="this.classList.add('neon-active')">
+            <h1 class="hero-title">BLEEP.</h1>
+        </div>
+        <p class="subtitle">The Explicit Content Converter.</p>
+
+        <div class="platform-dock">
+            <a href="https://developer.spotify.com/documentation/web-api" target="_blank" class="platform-btn spotify" onclick="hapticTick()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm100.7 364.9c-4.2 0-6.8-1.3-10.7-3.6-62.4-37.6-135-39.2-206.7-24.5-3.9 1-9 2.6-11.9 2.6-9.7 0-15.8-7.7-15.8-15.8 0-10.3 6.1-15.2 13.6-16.8 81.9-18.1 165.6-16.5 237 26.2 6.1 3.9 9.7 7.4 9.7 16.5s-7.1 15.4-15.2 15.4zm26.9-65.6c-5.2 0-8.7-2.3-12.3-4.2-62.5-37-155.7-51.9-238.6-29.4-4.8 1.3-7.4 2.6-11.9 2.6-10.7 0-19.4-8.7-19.4-19.4s5.2-17.8 15.5-20.7c27.8-7.8 56.2-13.6 97.8-13.6 64.9 0 127.6 16.1 177 45.5 8.1 4.8 11.3 11 11.3 19.7-.1 9-8.5 19.5-19.4 19.5zm31-76.2c-5.2 0-8.4-1.3-12.9-3.9-71.2-42.5-198.5-52.7-280.9-29.7-3.6 1-8.1 2.6-12.9 2.6-13.2 0-23.3-10.3-23.3-23.6 0-13.6 8.4-21.3 17.4-23.9 35.2-10.3 74.6-15.2 117.5-15.2 73 0 149.5 15.2 205.4 47.8 7.8 4.5 12.9 10.7 12.9 22.6 0 13.6-11 23.3-23.2 23.3z"/></svg>
+            </a>
+            <a href="https://developer.apple.com/documentation/musickitjs" target="_blank" class="platform-btn apple" onclick="hapticTick()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M401 106.6l-235.8 47.9c-20.9 4.2-36.2 22.7-36.2 44V342.1c-14-9.6-35.3-12.8-54.3-8.9-34 6.9-57 39.5-51.3 72.8 5.7 33.3 39.9 56.4 73.9 49.5 32.8-6.7 54.7-37 54.7-69.5V230.7l209.2-42.1V283c-14-9.6-35.3-12.8-54.3-8.9-34 6.9-57 39.5-51.3 72.8 5.7 33.3 39.9 56.4 73.9 49.5 32.8-6.7 54.7-37 54.7-69.5V152c0-24.6-19.6-45.3-43.2-45.4z"/></svg>
+            </a>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="bleep-input" id="bleepInput" placeholder="Enter song (e.g. 'TEST')" 
+                   autocomplete="off" autocorrect="off" spellcheck="false"
+                   onkeydown="if(event.key==='Enter') runBleepSearch()">
+        </div>
+        
+        <div class="btn-group">
+            <button class="main-btn" onclick="runBleepSearch()">Bleep it</button>
+            <button class="import-btn" onclick="openImportModal()">Import Playlist 📂</button>
+        </div>
+
+        <div id="bleep-results"></div>
+    </div>
+
+    <footer class="bleep-footer">
+        <div class="footer-slim-content">
+            <div class="footer-logo">BLEEP.</div>
+            <div class="footer-links">
+                <a href="#">How it Works</a> •
+                <a href="#">Privacy</a> •
+                <a href="#">Terms</a>
+            </div>
+            <div class="footer-copy">© 2026 Bleep Inc. Built by Eli.</div>
+        </div>
+    </footer>
+
+    <div id="musicModal" class="modal-overlay" onclick="this.style.display='none'">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3 style="margin:0; font-size:1.5rem;">Listen Where?</h3>
+            <div class="destination-grid">
+                <a id="btnSpotify" href="#" target="_blank" class="dest-btn" onclick="hapticTick()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm100.7 364.9c-4.2 0-6.8-1.3-10.7-3.6-62.4-37.6-135-39.2-206.7-24.5-3.9 1-9 2.6-11.9 2.6-9.7 0-15.8-7.7-15.8-15.8 0-10.3 6.1-15.2 13.6-16.8 81.9-18.1 165.6-16.5 237 26.2 6.1 3.9 9.7 7.4 9.7 16.5s-7.1 15.4-15.2 15.4zm26.9-65.6c-5.2 0-8.7-2.3-12.3-4.2-62.5-37-155.7-51.9-238.6-29.4-4.8 1.3-7.4 2.6-11.9 2.6-10.7 0-19.4-8.7-19.4-19.4s5.2-17.8 15.5-20.7c27.8-7.8 56.2-13.6 97.8-13.6 64.9 0 127.6 16.1 177 45.5 8.1 4.8 11.3 11 11.3 19.7-.1 9-8.5 19.5-19.4 19.5zm31-76.2c-5.2 0-8.4-1.3-12.9-3.9-71.2-42.5-198.5-52.7-280.9-29.7-3.6 1-8.1 2.6-12.9 2.6-13.2 0-23.3-10.3-23.3-23.6 0-13.6 8.4-21.3 17.4-23.9 35.2-10.3 74.6-15.2 117.5-15.2 73 0 149.5 15.2 205.4 47.8 7.8 4.5 12.9 10.7 12.9 22.6 0 13.6-11 23.3-23.2 23.3z"/></svg>
+                    Spotify
+                </a>
+                <a id="btnApple" href="#" target="_blank" class="dest-btn" onclick="hapticTick()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M401 106.6l-235.8 47.9c-20.9 4.2-36.2 22.7-36.2 44V342.1c-14-9.6-35.3-12.8-54.3-8.9-34 6.9-57 39.5-51.3 72.8 5.7 33.3 39.9 56.4 73.9 49.5 32.8-6.7 54.7-37 54.7-69.5V230.7l209.2-42.1V283c-14-9.6-35.3-12.8-54.3-8.9-34 6.9-57 39.5-51.3 72.8 5.7 33.3 39.9 56.4 73.9 49.5 32.8-6.7 54.7-37 54.7-69.5V152c0-24.6-19.6-45.3-43.2-45.4z"/></svg>
+                    Apple Music
+                </a>
+            </div>
+            <button class="modal-btn" style="background:#333; color:white; margin-top:20px;" onclick="document.getElementById('musicModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
+    <div id="playlistModal" class="modal-overlay" onclick="this.style.display='none'">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            
+            <div id="importStep1">
+                <h3 style="margin:0; font-size:1.5rem; margin-bottom:20px;">Connect Account</h3>
+                
+                <button class="auth-btn auth-spotify" onclick="simulateLogin('Spotify')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M248 8C111.1 8 0 119.1 0 256s111.1 248 248 248 248-111.1 248-248S384.9 8 248 8zm100.7 364.9c-4.2 0-6.8-1.3-10.7-3.6-62.4-37.6-135-39.2-206.7-24.5-3.9 1-9 2.6-11.9 2.6-9.7 0-15.8-7.7-15.8-15.8 0-10.3 6.1-15.2 13.6-16.8 81.9-18.1 165.6-16.5 237 26.2 6.1 3.9 9.7 7.4 9.7 16.5s-7.1 15.4-15.2 15.4zm26.9-65.6c-5.2 0-8.7-2.3-12.3-4.2-62.5-37-155.7-51.9-238.6-29.4-4.8 1.3-7.4 2.6-11.9 2.6-10.7 0-19.4-8.7-19.4-19.4s5.2-17.8 15.5-20.7c27.8-7.8 56.2-13.6 97.8-13.6 64.9 0 127.6 16.1 177 45.5 8.1 4.8 11.3 11 11.3 19.7-.1 9-8.5 19.5-19.4 19.5zm31-76.2c-5.2 0-8.4-1.3-12.9-3.9-71.2-42.5-198.5-52.7-280.9-29.7-3.6 1-8.1 2.6-12.9 2.6-13.2 0-23.3-10.3-23.3-23.6 0-13.6 8.4-21.3 17.4-23.9 35.2-10.3 74.6-15.2 117.5-15.2 73 0 149.5 15.2 205.4 47.8 7.8 4.5 12.9 10.7 12.9 22.6 0 13.6-11 23.3-23.2 23.3z"/></svg>
+                    Connect Spotify
+                </button>
+
+                <button class="auth-btn auth-apple" onclick="simulateLogin('Apple Music')">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M401 106.6l-235.8 47.9c-20.9 4.2-36.2 22.7-36.2 44V342.1c-14-9.6-35.3-12.8-54.3-8.9-34 6.9-57 39.5-51.3 72.8 5.7 33.3 39.9 56.4 73.9 49.5 32.8-6.7 54.7-37 54.7-69.5V230.7l209.2-42.1V283c-14-9.6-35.3-12.8-54.3-8.9-34 6.9-57 39.5-51.3 72.8 5.7 33.3 39.9 56.4 73.9 49.5 32.8-6.7 54.7-37 54.7-69.5V152c0-24.6-19.6-45.3-43.2-45.4z"/></svg>
+                    Connect Apple Music
+                </button>
+            </div>
+
+            <div id="importStep2" style="display:none;">
+                <h3 style="margin:0; font-size:1.5rem;">Select Playlist</h3>
+                <div class="playlist-list" id="plList">
+                    <div class="playlist-item" onclick="selectPlaylist('Summer 2026')">
+                        <div class="pl-img" style="background:linear-gradient(45deg, #ff0099, #493240)"></div>
+                        <div>
+                            <span class="pl-name">Summer 2026 ☀️</span>
+                            <span class="pl-count">10 Tracks • 3 Explicit</span>
+                        </div>
+                    </div>
+                    <div class="playlist-item" onclick="selectPlaylist('Workout Mix')">
+                        <div class="pl-img" style="background:linear-gradient(45deg, #00f260, #0575e6)"></div>
+                        <div>
+                            <span class="pl-name">Workout Mix 💪</span>
+                            <span class="pl-count">50 Tracks • 12 Explicit</span>
+                        </div>
+                    </div>
+                    <div class="playlist-item" onclick="selectPlaylist('Chill Vibes')">
+                        <div class="pl-img" style="background:linear-gradient(45deg, #a8ff78, #78ffd6)"></div>
+                        <div>
+                            <span class="pl-name">Chill Vibes 🧊</span>
+                            <span class="pl-count">20 Tracks • Clean</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="modal-btn" style="background:transparent; color:#888; font-size:0.9rem; margin-top:10px;" onclick="document.getElementById('playlistModal').style.display='none'">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // GLOBAL DATA STORE
+        let currentTracks = []; 
+
+        function hapticTick() { 
+            if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(15);
+        }
+        function hapticSuccess() { 
+            if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(70);
+        }
+
+        // --- RESET FUNCTION ---
+        function resetHome() {
+            hapticTick();
+            document.getElementById('bleepInput').value = '';
+            document.getElementById('bleep-results').innerHTML = '';
+            currentTracks = []; 
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- IMPORT FLOW ---
+        function openImportModal() {
+            hapticTick();
+            document.getElementById('playlistModal').style.display = 'flex';
+            document.getElementById('importStep1').style.display = 'block';
+            document.getElementById('importStep2').style.display = 'none';
+        }
+
+        function simulateLogin(service) {
+            hapticTick();
+            const btn = event.currentTarget;
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "Connecting...";
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText; 
+                document.getElementById('importStep1').style.display = 'none';
+                document.getElementById('importStep2').style.display = 'block';
+                document.getElementById('plList').style.display = 'block';
+            }, 1000);
+        }
+
+        async function selectPlaylist(name) {
+            hapticTick();
+            document.getElementById('playlistModal').style.display = 'none';
+            const output = document.getElementById('bleep-results');
+            output.innerHTML = `<p style='color:#d400ff'>Scanning '${name}'...</p>`;
+            
+            currentTracks = [];
+
+            // FETCH REAL DATA (DRAKE HITS) TO ENSURE VALID IMAGES
+            try {
+                const response = await fetch("https://itunes.apple.com/search?term=drake&media=music&entity=song&limit=5");
+                const data = await response.json();
+                
+                output.innerHTML = `<h3 style='margin:10px 0 20px 0;'>Detected: '${name}'</h3>`;
+                data.results.forEach(song => addSongToStore(song));
+            } catch(e) {
+                output.innerHTML = "Error loading playlist.";
+            }
+        }
+
+        async function runBleepSearch() {
+            hapticTick(); 
+            const query = document.getElementById('bleepInput').value;
+            const output = document.getElementById('bleep-results');
+            if (!query) return;
+            
+            output.innerHTML = "<p style='color:#666'>Searching...</p>";
+            currentTracks = []; 
+
+            if (query.toLowerCase() === "test") {
+                output.innerHTML = "";
+                addSongToStore({
+                    trackName: "Houdini", artistName: "Eminem",
+                    artworkUrl60: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4e/15/2e/4e152e37-1473-1383-2949-c1cb41724f7e/198588661642.jpg/60x60bb.jpg",
+                    artworkUrl100: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4e/15/2e/4e152e37-1473-1383-2949-c1cb41724f7e/198588661642.jpg/100x100bb.jpg",
+                    trackExplicitness: "explicit",
+                    trackViewUrl: "https://music.apple.com/us/album/houdini/1749109292?i=1749109298"
+                });
+                return;
+            }
+
+            const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&entity=song&country=US&limit=10`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                output.innerHTML = ""; 
+                data.results.forEach(song => addSongToStore(song));
+            } catch (error) { output.innerHTML = "Error connecting."; }
+        }
+
+        function addSongToStore(song) {
+            const index = currentTracks.length;
+            currentTracks.push(song);
+            
+            const output = document.getElementById('bleep-results');
+            let actionHTML = "";
+            let badgeHTML = `<span class="badge clean">CLEAN</span>`;
+
+            if (song.trackExplicitness === "explicit") {
+                badgeHTML = `<span class="badge explicit">EXPLICIT</span>`;
+                actionHTML = `<button class="fix-btn" onclick="fixTrack(${index}, this)">CLEAN IT ✨</button>`;
+            }
+
+            const imgUrl = song.artworkUrl100 || song.artworkUrl60;
+            
+            const html = `
+            <div class="bleep-card">
+                <img src="${imgUrl}" class="bleep-art" alt="${song.trackName}">
+                <div class="bleep-info">
+                    <span class="b-title">${song.trackName}</span>
+                    <span class="b-artist">${song.artistName}</span>
+                </div>
+                ${badgeHTML}
+                ${actionHTML}
+            </div>`;
+            
+            output.insertAdjacentHTML('beforeend', html);
+        }
+
+        async function fixTrack(index, btn) {
+            hapticTick();
+            btn.innerText = "...";
+            
+            const originalSong = currentTracks[index];
+            const artist = originalSong.artistName;
+            const track = originalSong.trackName;
+
+            // SIMULATION for Demo
+            if (track === "Houdini" && artist === "Eminem") {
+                setTimeout(() => { 
+                    const cleanVersion = { ...originalSong, trackViewUrl: "https://music.apple.com/us/album/houdini/1749109292?i=1749109298" };
+                    updateCardToClean(btn, cleanVersion);
+                }, 800);
+                return;
+            }
+
+            // Real Search
+            const query = `${artist} ${track}`;
+            const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&entity=song&country=US&limit=25`;
+            const response = await fetch(url);
+            const data = await response.json();
+            const clean = data.results.find(s => s.trackExplicitness !== "explicit");
+            
+            if (clean) updateCardToClean(btn, clean);
+            else { btn.innerText = "Failed"; btn.style.background = "#333"; }
+        }
+
+        function updateCardToClean(btn, cleanSong) {
+            hapticSuccess();
+            const card = btn.parentElement;
+            
+            const appleLink = cleanSong.trackViewUrl;
+            const spotifyQuery = cleanSong.artistName + " " + cleanSong.trackName + " Clean";
+            const spotLink = `spotify:search:${encodeURIComponent(spotifyQuery)}`;
+            const imgUrl = cleanSong.artworkUrl100 || cleanSong.artworkUrl60;
+
+            card.innerHTML = `
+                <img src="${imgUrl}" class="bleep-art">
+                <div class="bleep-info">
+                    <span class="b-title">${cleanSong.trackName}</span>
+                    <span class="b-artist">${cleanSong.artistName}</span>
+                </div>
+                <button class="badge matched-btn" onclick="openDestinations('${appleLink}', '${spotLink}')">MATCHED ✅</button>
+            `;
+            card.classList.add("card-success"); 
+        }
+
+        function openDestinations(apple, spotify) {
+            hapticTick();
+            document.getElementById('btnApple').href = apple;
+            document.getElementById('btnSpotify').href = spotify;
+            document.getElementById('musicModal').style.display = 'flex';
+        }
+    </script>
+</body>
+</html>

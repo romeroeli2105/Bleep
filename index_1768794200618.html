@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BLEEP.</title>
+    <style>
+        /* --- GLOBAL RESET --- */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: radial-gradient(circle at center, #1a0520 0%, #050505 60%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            overflow-x: hidden;
+        }
+        
+        * { box-sizing: border-box; }
+
+        /* --- 1. NAVBAR --- */
+        .bleep-nav {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 30px 20px; /* Adjusted for mobile safety */
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+        .nav-logo:hover { opacity: 1; text-shadow: 0 0 15px rgba(212,0,255,0.5); }
+        .nav-logo span { color: #d400ff; }
+
+        /* --- 2. HERO SECTION --- */
+        .hero-section {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            margin-bottom: 60px;
+        }
+
+        /* 3D TITLE ZONE */
+        .title-zone {
+            display: inline-block;
+            padding: 40px; /* Tighter padding for mobile */
+            cursor: default;
+            perspective: 500px;
+        }
+        
+        .hero-title {
+            font-size: 15vw; /* Responsive font size based on screen width */
+            max-font-size: 8rem;
+            margin: 0;
+            line-height: 0.9;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+            color: #1a0515;
+            -webkit-text-stroke: 2px #541a66; /* Thinner stroke for cleanness */
+            text-shadow: 0 10px 20px rgba(0,0,0,1);
+            opacity: 1;
+            transition: all 0.1s;
+            transform: rotateX(5deg);
+        }
+
+        /* Desktop override for font size */
+        @media (min-width: 800px) {
+            .hero-title { font-size: 8rem; -webkit-text-stroke: 3px #541a66; }
+        }
+
+        .neon-active .hero-title {
+            color: #fff;
+            -webkit-text-stroke: 3px #e080ff;
+            text-shadow: 0 0 5px #fff, 0 0 20px #d400ff, 0 0 80px #d400ff, 0 20px 30px rgba(0,0,0,1);
+            animation: neon-flicker 1.5s steps(15, end) forwards, neon-hum 0.1s infinite alternate;
+        }
+
+        @keyframes neon-flicker {
+            0%   { opacity: 0.8; color: #1a0515; text-shadow: none; }
+            5%   { opacity: 1; color: #fff; text-shadow: 0 0 20px #d400ff; }
+            10%  { opacity: 0.8; color: #1a0515; text-shadow: none; }
+            30%  { opacity: 1; color: #fff; text-shadow: 0 0 60px #d400ff; }
+            100% { opacity: 1; color: #fff; }
+        }
+        @keyframes neon-hum {
+            from { text-shadow: 0 0 10px #fff, 0 0 20px #d400ff, 0 0 80px #d400ff; }
+            to   { text-shadow: 0 0 12px #fff, 0 0 22px #d400ff, 0 0 85px #d400ff; }
+        }
+
+        .subtitle { color: #888; font-size: 1.1rem; margin-bottom: 40px; font-weight: 300; margin-top: 15px; }
+
+        /* SEARCH BAR */
+        .search-container { position: relative; max-width: 500px; width: 100%; margin: 0 auto; padding: 10px; }
+        .bleep-input {
+            width: 100%;
+            padding: 20px;
+            font-size: 18px;
+            border-radius: 15px;
+            border: 2px solid #333;
+            background: #0a0a0a;
+            color: white;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+            -webkit-appearance: none; /* iOS Fix */
+        }
+        .search-container:hover .bleep-input { border-color: #8c00aa; box-shadow: 0 0 30px rgba(170,0,212,0.2); transform: scale(1.02); }
+        .bleep-input:focus { border-color: #d400ff; box-shadow: 0 0 60px rgba(212,0,255,0.5); background: #000; transform: scale(1.02); }
+
+        .main-btn {
+            margin-top: 20px;
+            padding: 15px 50px;
+            font-size: 16px;
+            font-weight: 700;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .main-btn:hover { transform: translateY(-3px); box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+        
+        #bleep-results { margin-top: 40px; display: flex; flex-direction: column; gap: 15px; width: 100%; }
+
+        /* --- 3. FOOTER --- */
+        .bleep-footer {
+            margin-top: auto;
+            width: 100%;
+            background: #080808;
+            border-top: 1px solid rgba(212,0,255,0.2);
+            box-shadow: 0 -10px 40px rgba(212,0,255,0.05);
+            padding: 50px 20px;
+            text-align: left;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 40px;
+        }
+
+        .footer-brand h2 { margin: 0; font-size: 1.5rem; font-weight: 800; }
+        .footer-brand span { color: #d400ff; }
+        .footer-tagline { color: #555; font-size: 0.9rem; margin-top: 10px; max-width: 200px; }
+
+        .footer-column h3 { color: white; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; opacity: 0.6; }
+        .footer-column a { display: block; color: #666; text-decoration: none; margin-bottom: 12px; font-size: 0.9rem; transition: 0.3s; }
+        .footer-column a:hover { color: #d400ff; padding-left: 5px; }
+
+        .footer-bottom {
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid #111;
+            text-align: center;
+            color: #333;
+            font-size: 0.8rem;
+        }
+
+        /* --- CARDS --- */
+        .bleep-card { 
+            background: rgba(20,20,20,0.9); border: 1px solid #333; padding: 15px; border-radius: 16px; 
+            display: flex; align-items: center; text-align: left; animation: slideUp 0.4s ease-out forwards; 
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .bleep-art { width: 60px; height: 60px; border-radius: 8px; margin-right: 15px; object-fit: cover; flex-shrink: 0; }
+        .bleep-info { flex-grow: 1; min-width: 0; }
+        .b-title { font-weight: 700; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .b-artist { color: #888; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        
+        .badge { font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; font-weight: 800; margin-left: 10px; flex-shrink: 0; }
+        .clean { background: rgba(0,255,127,0.1); color: #00ff7f; border: 1px solid #00ff7f; }
+        .explicit { background: rgba(255,59,48,0.1); color: #ff3b30; border: 1px solid #ff3b30; }
+        
+        .fix-btn { 
+            background: #ff3b30; color: white; border: none; padding: 8px 15px; border-radius: 20px; 
+            font-weight: bold; font-size: 0.75rem; cursor: pointer; margin-left: 10px; flex-shrink: 0;
+        }
+        .fix-btn:hover { background: #ff6055; box-shadow: 0 0 15px rgba(255, 59, 48, 0.4); }
+        .card-success { border-color: #00ff7f; background: rgba(0, 255, 127, 0.05); }
+
+        /* MOBILE OPTIMIZATIONS */
+        @media (max-width: 600px) {
+            .bleep-nav { justify-content: center; padding: 20px; }
+            .hero-section { margin-bottom: 30px; }
+            .footer-content { flex-direction: column; text-align: center; gap: 40px; }
+            .footer-tagline { margin: 10px auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="bleep-nav">
+        <a href="#" class="nav-logo">BLEEP<span>.</span></a>
+    </nav>
+
+    <div class="hero-section">
+        <div class="title-zone" onmouseover="this.classList.add('neon-active')" ontouchstart="this.classList.add('neon-active')">
+            <h1 class="hero-title">BLEEP.</h1>
+        </div>
+        <p class="subtitle">The Explicit Content Converter.</p>
+
+        <div class="search-container">
+            <input type="text" class="bleep-input" id="bleepInput" placeholder="Enter song (e.g. 'TEST')" onkeydown="if(event.key==='Enter') runBleepSearch()">
+        </div>
+        <button class="main-btn" onclick="runBleepSearch()">Bleep it</button>
+
+        <div id="bleep-results"></div>
+    </div>
+
+    <footer class="bleep-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h2>BLEEP<span>.</span></h2>
+                <p class="footer-tagline">Making the internet safe for your grandma.</p>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Product</h3>
+                <a href="#">How it Works</a>
+                <a href="#">Download App</a>
+                <a href="#">Pricing</a>
+            </div>
+
+            <div class="footer-column">
+                <h3>Legal</h3>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Cookie Settings</a>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            &copy; 2026 Bleep Inc. Built by Eli.
+        </div>
+    </footer>
+
+    <script>
+        async function runBleepSearch() {
+            const query = document.getElementById('bleepInput').value;
+            const output = document.getElementById('bleep-results');
+            if (!query) return;
+            output.innerHTML = "<p style='color:#666'>Searching...</p>";
+
+            if (query.toLowerCase() === "test") {
+                output.innerHTML = "";
+                renderBleepCard({
+                    trackName: "Houdini", artistName: "Eminem",
+                    artworkUrl60: "https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/4e/15/2e/4e152e37-1473-1383-2949-c1cb41724f7e/198588661642.jpg/60x60bb.jpg",
+                    trackExplicitness: "explicit"
+                });
+                return;
+            }
+
+            const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&country=US&limit=10`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                output.innerHTML = ""; 
+                data.results.forEach(song => renderBleepCard(song));
+            } catch (error) { output.innerHTML = "Error connecting."; }
+        }
+
+        function renderBleepCard(song) {
+            const output = document.getElementById('bleep-results');
+            let actionHTML = "";
+            let badgeHTML = `<span class="badge clean">CLEAN</span>`;
+
+            if (song.trackExplicitness === "explicit") {
+                badgeHTML = `<span class="badge explicit">EXPLICIT</span>`;
+                actionHTML = `<button class="fix-btn" onclick="fixBleepSong('${song.artistName}', '${song.trackName}', this)">CLEAN IT ✨</button>`;
+            }
+
+            output.innerHTML += `
+            <div class="bleep-card">
+                <img src="${song.artworkUrl60}" class="bleep-art">
+                <div class="bleep-info">
+                    <span class="b-title">${song.trackName}</span>
+                    <span class="b-artist">${song.artistName}</span>
+                </div>
+                ${badgeHTML}
+                ${actionHTML}
+            </div>`;
+        }
+
+        async function fixBleepSong(artist, track, btn) {
+            btn.innerText = "...";
+            if (track === "Houdini" && artist === "Eminem") {
+                setTimeout(() => { swapToClean(btn, {
+                    trackName: "Houdini", artistName: "Eminem",
+                    artworkUrl60: "https://is1-ssl.mzstatic.com/image/thumb/Music221/v4/f4/9b/37/f49b375b-986b-a249-1d42-0f117c2f1f0a/198588662052.jpg/60x60bb.jpg"
+                })}, 800);
+                return;
+            }
+            const query = `${artist} ${track}`;
+            const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&country=US&limit=15`;
+            const response = await fetch(url);
+            const data = await response.json();
+            const clean = data.results.find(s => s.trackExplicitness !== "explicit");
+            if (clean) swapToClean(btn, clean);
+            else { btn.innerText = "Failed"; btn.style.background = "#333"; }
+        }
+
+        function swapToClean(btn, clean) {
+            const card = btn.parentElement;
+            card.innerHTML = `
+                <img src="${clean.artworkUrl60}" class="bleep-art">
+                <div class="bleep-info">
+                    <span class="b-title">${clean.trackName}</span>
+                    <span class="b-artist">${clean.artistName}</span>
+                </div>
+                <span class="badge clean">MATCHED ✅</span>
+            `;
+            card.classList.add("card-success"); 
+        }
+    </script>
+</body>
+</html>
